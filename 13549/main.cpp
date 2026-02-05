@@ -23,6 +23,7 @@ bool check(int a, int b)
 
 void search(int a, int b)
 {
+  // pair<int, int>
   queue<int> q;
   checked[a] = true;
   q.push(a);

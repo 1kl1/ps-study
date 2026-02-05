@@ -8,84 +8,81 @@
 #include <vector>
 
 using namespace std;
-
-bool A_array[1000001];
-pair<int, int> BC_array[1000001];
-vector<int> A_vector;
-
-struct Node
-{
-  int data;
-  Node *left;
-  Node *right;
+struct Enemy {
+  int a, b, c;
 };
 
-Node *createNode(int data)
-{
-  Node *newNode = new Node();
-  newNode->data = data;
-  newNode->left = NULL;
-  newNode->right = NULL;
-}
+vector<Enemy> enemies;
+vector<int> A_vector;
+vector<pair<int, int>> BC_vector;
 
-bool insertNode(Node *root, int data)
-{
-  if (data < root->data)
-  {
-    if (root->left == NULL)
-    {
-      root->left = createNode(data);
-      return true;
-    }
-    insertNode(root->left, data);
-  }
-}
-
-int cmp(const void *a, const void *b)
-{
-  int *rowA = (int *)a;
-  int *rowB = (int *)b;
-  return rowA[1] - rowB[1];
-}
-
-void solve()
-{
+void solve() {
   int n;
   scanf("%d", &n);
-  if (n == 0)
-  {
+
+  if (n == 0) {
     printf("0");
     return;
   }
-  int a_cnt = 0;
-  for (int i = 0; i < n; i++)
-  {
-    int a, b, c;
-    scanf("%d %d %d", &a, &b, &c);
+
+  enemies.resize(n);
+  for (int i = 0; i < n; i++) {
+    scanf("%d %d %d", &enemies[i].a, &enemies[i].b, &enemies[i].c);
+    A_vector.push_back(enemies[i].a);
   }
 
-  // qsort(BC_array, b_num, sizeof(int) * 2, cmp);
-  // int curr = BC_array[0][1];
+  sort(A_vector.begin(), A_vector.end());
+  A_vector.erase(unique(A_vector.begin(), A_vector.end()), A_vector.end());
 
-  // for (int i = 1; i < b_num; i++)
-  // {
-  //   int from = BC_array[i][0];
-  //   int to = BC_array[i][1];
-  //   if (curr < from)
-  //   {
-  //     bc_cnt++;
-  //     curr = to;
-  //   }
-  // }
+  int a_cnt = A_vector.size();
+  int bc_cnt = 0;
 
-  printf("%d", a_cnt);
+  for (int i = 0; i < n; i++) {
+    int current_a = enemies[i].a;
+    int b = enemies[i].b;
+    int c = enemies[i].c;
+
+    auto it = lower_bound(A_vector.begin(), A_vector.end(), b);
+
+    bool covered = false;
+
+    if (it != A_vector.end() && *it <= c) {
+      if (*it != current_a) {
+        covered = true;
+      } else {
+        auto next_it = it + 1;
+        if (next_it != A_vector.end() && *next_it <= c) {
+          covered = true;
+        }
+      }
+    }
+
+    // 없는 case
+    if (!covered) {
+      BC_vector.push_back(make_pair(b, c));
+    }
+  }
+
+  sort(BC_vector.begin(), BC_vector.end(),
+       [](pair<int, int> x, pair<int, int> y) { return x.second < y.second; });
+
+  int curr = -1;
+  for (auto iter = BC_vector.begin(); iter < BC_vector.end(); iter++) {
+    int from = iter->first;
+    int to = iter->second;
+    if (curr < from) {
+      bc_cnt++;
+      curr = to;
+    }
+  }
+
+  printf("%d", a_cnt + bc_cnt);
 }
 
-int main()
-{
+int main() {
   ios_base::sync_with_stdio(false);
   cin.tie(NULL);
-  fill_n(A_array, 1000001, false);
+
   solve();
   return 0;
 }
