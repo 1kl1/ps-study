@@ -9,37 +9,35 @@
 
 using namespace std;
 
-int gcd(int a, int b)
-{
-  if (b == 0)
-    return a;
+int gcd(int a, int b) {
+  if (b == 0) return a;
   return gcd(b, a % b);
 }
 
-int lcm(int a, int b)
-{
-  return a * b / gcd(a, b);
-}
-
-void solve()
-{
-  int a, b;
-  scanf("%d %d", &a, &b);
-  int ab_gcd = gcd(a, b);
-  int ab_lcm = lcm(a, b);
-  int count = 0;
-  for (int c = ab_gcd; c <= ab_lcm; c += ab_gcd)
-  {
-    if (ab_gcd == gcd(a, c) && ab_lcm == lcm(b, c))
-      count++;
+int lcm(int a, int b) { return a * b / gcd(a, b); }
+void solve() {
+  int A, B;
+  scanf("%d %d", &A, &B);
+  if (B % A != 0) {
+    printf("0");
+    return;
   }
-  printf("%d", count);
-}
 
-int main()
-{
+  int y = B / A, cnt = 0;
+  for (int i = 1; i * i <= y; i++) {
+    if (y % i == 0) {
+      cnt++;
+      if (i * i < y) cnt++;
+    }
+  }
+
+  printf("%d", cnt);
+}
+int main() {
   ios_base::sync_with_stdio(false);
   cin.tie(NULL);
+
   solve();
+
   return 0;
 }
